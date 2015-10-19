@@ -1,11 +1,13 @@
-function Tile(position, value) {
+function Tile(position, color) {
   this.x                = position.x;
   this.y                = position.y;
-  this.value            = value || 2;
+  // this.value            = value || 2;
+  this.color            = color || 1;
 
   this.previousPosition = null;
-  this.mergedFrom       = null; // Tracks tiles that merged together
-}
+  this.ahead            = null;
+  this.dropOut          = false;
+};
 
 Tile.prototype.savePosition = function () {
   this.previousPosition = { x: this.x, y: this.y };
@@ -17,11 +19,16 @@ Tile.prototype.updatePosition = function (position) {
 };
 
 Tile.prototype.serialize = function () {
+  
+  if(this.dropOut){
+    return null;
+  };
+  
   return {
     position: {
       x: this.x,
       y: this.y
     },
-    value: this.value
+    color: this.color
   };
 };

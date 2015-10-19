@@ -3,13 +3,13 @@
 
 $field-width: 500px;
 $grid-spacing: 15px;
-$grid-row-cells: 4;
+$grid-row-cells: 5;
 $tile-size: ($field-width - $grid-spacing * ($grid-row-cells + 1)) / $grid-row-cells;
 $tile-border-radius: 3px;
 
 $mobile-threshold: $field-width + 20px;
 
-$text-color: #776E65;
+$text-color: #FFF;
 $bright-text-color: #f9f6f2;
 
 $tile-color: #eee4da;
@@ -17,7 +17,7 @@ $tile-gold-color: #edc22e;
 $tile-gold-glow-color: lighten($tile-gold-color, 15%);
 
 $game-container-margin-top: 40px;
-$game-container-background: #bbada0;
+$game-container-background: #000;
 
 $transition-speed: 100ms;
 
@@ -25,7 +25,7 @@ html, body {
   margin: 0;
   padding: 0;
 
-  background: #faf8ef;
+  background: #222;
   color: $text-color;
   font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 18px;
@@ -201,7 +201,7 @@ hr {
       right: 0;
       bottom: 0;
       left: 0;
-      background: rgba($tile-color, .5);
+      background: rgba(#222, .85);
       z-index: 100;
 
       text-align: center;
@@ -281,6 +281,10 @@ hr {
     &:last-child {
       margin-right: 0;
     }
+    
+    // &.highlight {
+    //   @include animation(pop 200ms ease $transition-speed);
+    // }
   }
 
   .tile-container {
@@ -400,6 +404,51 @@ hr {
 
     $exponent: $exponent + 1;
   }
+  
+  &.tile-color-1 .tile-inner{
+    // background: #28FC42;
+    background: #247BA0;
+  }
+  
+  &.tile-color-2 .tile-inner{
+    // background: #E5C51E;
+    background: #70C1B3;
+  }
+  
+  &.tile-color-3 .tile-inner{
+    // background: #4500FF;
+    background: #FF1654;
+  }
+  
+  &.tile-color-4 .tile-inner{
+    // background: #A22AE5;
+    background: #ED6A5A;
+  }
+  
+  &.tile-color-5 .tile-inner{
+    // background: #2EBAFC;
+    background: #F3FFBD;
+  }
+  
+  &.tile-color-6 .tile-inner{
+    background: #FFF;
+  }
+  
+  &.tile-color-7 .tile-inner{
+    background: #FF0099;
+  }
+  
+  &.tile-color-8 .tile-inner{
+    background: #FF2000;
+  }
+  
+  &.tile-color-9 .tile-inner{
+    background: #57497B;
+  }
+  
+  &.tile-color-10 .tile-inner{
+    background: #FC5E2E;
+  }
 
   // Super tiles (above 2048)
   &.tile-super .tile-inner {
@@ -451,6 +500,24 @@ hr {
   @include animation-fill-mode(backwards);
 }
 
+@include keyframes(drop) {
+  0% {
+    opacity: 1;
+    @include transform(scale(1));
+  }
+
+  100% {
+    opacity: 0;
+    @include transform(scale(0));
+  }
+}
+
+.tile-drop .tile-inner {
+  z-index: 20;
+  @include animation(drop 500ms ease $transition-speed);
+  @include animation-fill-mode(forwards);
+}
+
 .above-game {
   @include clearfix;
 }
@@ -474,12 +541,12 @@ hr {
 
 @include smaller($mobile-threshold) {
   // Redefine variables for smaller screens
-  $field-width: 280px;
-  $grid-spacing: 10px;
-  $grid-row-cells: 4;
-  $tile-size: ($field-width - $grid-spacing * ($grid-row-cells + 1)) / $grid-row-cells;
-  $tile-border-radius: 3px;
-  $game-container-margin-top: 17px;
+  $field-width: 280px !global;
+  $grid-spacing: 10px !global;
+  $grid-row-cells: 5 !global;
+  $tile-size: ($field-width - $grid-spacing * ($grid-row-cells + 1)) / $grid-row-cells !global;
+  $tile-border-radius: 3px !global;
+  $game-container-margin-top: 17px !global;
 
   html, body {
     font-size: 15px;

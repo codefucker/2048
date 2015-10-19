@@ -26,12 +26,25 @@ Grid.prototype.fromState = function (state) {
 
     for (var y = 0; y < this.size; y++) {
       var tile = state[x][y];
-      row.push(tile ? new Tile(tile.position, tile.value) : null);
+      row.push(tile ? new Tile(tile.position, tile.color) : null);
     }
   }
 
   return cells;
 };
+
+// Grid.prototype.randomAvailableCell = function (color) {
+//   var cells = this.availableCells();
+
+//   if (cells.length) {
+//     var cell = cells[Math.floor(Math.random() * cells.length)];
+//     var cellsNear = this.getCellsNear(cell);
+    
+//     cellsNear.forEach(function(){
+      
+//     });
+//   }
+// };
 
 // Find the first available random position
 Grid.prototype.randomAvailableCell = function () {
@@ -46,6 +59,7 @@ Grid.prototype.availableCells = function () {
   var cells = [];
 
   this.eachCell(function (x, y, tile) {
+    // if (!tile || tile.dropOut) {
     if (!tile) {
       cells.push({ x: x, y: y });
     }
@@ -90,6 +104,18 @@ Grid.prototype.insertTile = function (tile) {
   this.cells[tile.x][tile.y] = tile;
 };
 
+Grid.prototype.getTiles = function (tile) {
+  var tales = [];
+
+  this.eachCell(function (x, y, tile) {
+    if (tile) {
+      tales.push(tile);
+    }
+  });
+
+  return tales;
+};
+
 Grid.prototype.removeTile = function (tile) {
   this.cells[tile.x][tile.y] = null;
 };
@@ -97,6 +123,27 @@ Grid.prototype.removeTile = function (tile) {
 Grid.prototype.withinBounds = function (position) {
   return position.x >= 0 && position.x < this.size &&
          position.y >= 0 && position.y < this.size;
+};
+
+Grid.prototype.getCellsNear = function (cell, asix) {
+  
+  var arr = [];
+
+  var a = typeof asix !== 'undefined' ? asix : false;
+  // console.log(a);
+
+  
+  if(!a || a == 'x'){
+    arr.push({x: cell.x + 1, y: cell.y});
+    arr.push({x: cell.x - 1, y: cell.y});
+  };
+
+  if(!a || a == 'y'){
+    arr.push({x: cell.x, y: cell.y + 1});
+    arr.push({x: cell.x, y: cell.y - 1});
+  };
+  
+  return arr;
 };
 
 Grid.prototype.serialize = function () {
