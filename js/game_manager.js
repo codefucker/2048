@@ -8,8 +8,11 @@ function GameManager(size, colors, InputManager, Actuator, StorageManager) {
   this.startTiles     = 2;
 
   this.inputManager.on("move", this.move.bind(this));
+  this.inputManager.on("goBack", this.move.bind(this, -1));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+  
+  this.undoStack = [];
 
   this.setup();
 }
@@ -70,8 +73,12 @@ GameManager.prototype.addStartTiles = function () {
 GameManager.prototype.addRandomTile = function () {
   if (this.grid.cellsAvailable()) {
     
+    var total = this.colors.reduce(function(sum, current) {
+      return sum + current;
+    }, 0);
+    
     var color;
-    var rand = Math.random();
+    var rand = Math.random() * total;
     var sum = 0;
     
     for (var i = 0; i < this.colors.length; i++) {
@@ -154,10 +161,45 @@ GameManager.prototype.moveTile = function (tile, cell) {
 
 // Move tiles on the grid in the specified direction
 GameManager.prototype.move = function (direction) {
+  
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
+  
+  if (direction == -1) {
+    
+    if (this.undoStack.length > 0) {
+      
+      var prev = this.undoStack.pop();
+      
+      this.grid.cells = this.grid.empty();
+      this.score = prev.score;
+      
+      for (var i in prev.tiles) {
+        var t = prev.tiles[i];
+        var tile = new Tile({x: t.x, y: t.y}, t.color);
+        
+        tile.previousPosition = {
+          x: t.previousPosition.x,
+          y: t.previousPosition.y
+        };
+        
+        this.grid.cells[tile.x][tile.y] = tile;
+      }
+      
+      this.over = false;
+      this.won = false;
+      this.keepPlaying = false;
+      
+      this.actuate();
+      
+    }
+    
+    return;
+  }
 
-  if (this.isGameTerminated()) return; // Don't do anything if the game's over
+  if (this.isGameTerminated()){
+    return;
+  } // Don't do anything if the game's over
 
   var cell, tile;
   
@@ -165,6 +207,7 @@ GameManager.prototype.move = function (direction) {
   var traversals = this.buildTraversals(vector);
   var moved      = false;
   var droped     = false;
+  var undo       = {score: this.score, tiles: []};
 
   // Save the current tile positions and remove merger information
   this.prepareTiles();
@@ -246,6 +289,8 @@ GameManager.prototype.move = function (direction) {
         }
         
 
+        undo.tiles.push(tile.save(farthest));
+        
         // self.moveTile(tile, positions.farthest);
         self.moveTile(tile, farthest);
 
@@ -280,6 +325,9 @@ GameManager.prototype.move = function (direction) {
   
   if (moved) {
     this.addRandomTile();
+    
+    // Save state
+    this.undoStack.push(undo);
 
     if (!this.movesAvailable()) {
       this.over = true; // Game over!
