@@ -4,8 +4,6 @@ window.requestAnimationFrame(function () {
   
   loadJSON('inicialization.json', function(res){
     
-    console.log(res);
-    
     new GameManager(
       res.size,
       res.colorsVariability,

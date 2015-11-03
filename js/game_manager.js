@@ -84,7 +84,7 @@ GameManager.prototype.addRandomTile = function () {
     for (var i = 0; i < this.colors.length; i++) {
         sum += this.colors[i];
         // sum = +weight_sum.toFixed(2);
-         
+        
         if (rand <= sum) {
             color = i + 1;
             break;
@@ -204,7 +204,6 @@ GameManager.prototype.move = function (direction) {
   var cell, tile;
   
   var vector     = this.getVector(direction);
-  var traversals = this.buildTraversals(vector);
   var moved      = false;
   var droped     = false;
   var undo       = {score: this.score, tiles: []};
@@ -212,95 +211,63 @@ GameManager.prototype.move = function (direction) {
   // Save the current tile positions and remove merger information
   this.prepareTiles();
 
-  // Traverse the grid in the right direction and move tiles
   // var i = 0;
-  traversals.x.forEach(function (x) {
-    traversals.y.forEach(function (y) {
-      cell = { x: x, y: y };
-      tile = self.grid.cellContent(cell);
+  // Traverse the grid in the right direction and move tiles
+  this.doTraversals(vector, function(x, y){
+    cell = { x: x, y: y };
+    tile = self.grid.cellContent(cell);
+    
+    // i++;
+    // setTimeout(function(){
       
-      // i++;
-      // setTimeout(function(){
-        
-      //   var item = document.querySelectorAll('.grid-row')[x].children[y]
-        
-      //   item.classList.add('highlight');
-        
-      //   setTimeout(function(){
-      //     item.classList.remove('highlight')
-      //   }, 1000);
-      // }, 200 * i)
+    //   var item = document.querySelectorAll('.grid-row')[y].children[x]
+      
+    //   item.classList.add('highlight');
+      
+    //   setTimeout(function(){
+    //     item.classList.remove('highlight')
+    //   }, 1000);
+    // }, 200 * i)
 
-      if (tile) {
-        // var positions = self.findFarthestPosition(cell, vector);
-        
-        if(tile.ahead !== null){
-          var ahead = tile.ahead;
-        }
-        
-        else{
-          var asix = (vector.x == 0) ? 'x' : 'y';
-          var ahead = self.countTilesAhead(cell, vector);
-          var tilesNear = self.findSimilarTilesNear(tile, asix);
-          
-          if(tilesNear.length){
-            var maxAhead = ahead;
-
-            tilesNear.forEach(function(nearTile){
-              var ahead = self.countTilesAhead(nearTile, vector);
-              maxAhead = (maxAhead < ahead) ? ahead : maxAhead;
-            });
-            
-            tilesNear.forEach(function(nearTile){
-              nearTile.ahead = maxAhead;
-            });
-
-            tile.ahead = ahead = maxAhead;
-          }
-          
-        }
-        
-        
-        var farthest = {};
-        
-        
-        if(vector.x == 0){
-          farthest.x = cell.x;
-        }
-        
-        else if(vector.x < 0){
-          farthest.x = ahead;
-        }
-        
-        else if(vector.x > 0){
-          farthest.x = self.size - 1 - ahead;
-        }
-        
-        if(vector.y == 0){
-          farthest.y = cell.y;
-        }
-        
-        else if(vector.y < 0){
-          farthest.y = ahead;
-        }
-        
-        else if(vector.y > 0){
-          farthest.y = self.size - 1 - ahead;
-        }
-        
-
-        undo.tiles.push(tile.save(farthest));
-        
-        // self.moveTile(tile, positions.farthest);
-        self.moveTile(tile, farthest);
-
-
-        if (!self.positionsEqual(cell, tile)) {
-          moved = true; // The tile moved from its original cell!
-        }
-        
+    if (tile) {
+      // var positions = self.findFarthestPosition(cell, vector);
+      
+      if(tile.ahead !== null){
+        var ahead = tile.ahead;
       }
-    });
+      
+      else{
+        var asix = (vector.x == 0) ? 'x' : 'y';
+        var ahead = self.countTilesAhead(cell, vector);
+        var tilesNear = self.findSimilarTilesNear(tile, asix);
+        
+        if(tilesNear.length){
+          var maxAhead = ahead;
+
+          tilesNear.forEach(function(nearTile){
+            var ahead = self.countTilesAhead(nearTile, vector);
+            maxAhead = (maxAhead < ahead) ? ahead : maxAhead;
+          });
+          
+          tilesNear.forEach(function(nearTile){
+            nearTile.ahead = maxAhead;
+          });
+
+          tile.ahead = ahead = maxAhead;
+        }
+      }
+      
+      var farthest = self.getFarthestPosition(vector, cell, ahead);
+      
+      undo.tiles.push(tile.save(farthest));
+      // self.moveTile(tile, positions.farthest);
+      self.moveTile(tile, farthest);
+
+      if (!self.positionsEqual(cell, tile)) {
+        moved = true; // The tile moved from its original cell!
+      }
+      
+    }
   });
 
   var tiles  = self.grid.getTiles();
@@ -358,7 +325,8 @@ GameManager.prototype.getVector = function (direction) {
 };
 
 // Build a list of positions to traverse in the right order
-GameManager.prototype.buildTraversals = function (vector) {
+GameManager.prototype.doTraversals = function (vector, callback) {
+  
   var traversals = { x: [], y: [] };
 
   for (var pos = 0; pos < this.size; pos++) {
@@ -367,10 +335,57 @@ GameManager.prototype.buildTraversals = function (vector) {
   }
 
   // Always traverse from the farthest cell in the chosen direction
-  if (vector.x === 1) traversals.x = traversals.x.reverse();
-  if (vector.y === 1) traversals.y = traversals.y.reverse();
+  if (vector.x ===  1) traversals.x = traversals.x.reverse();
+  // if (vector.y === -1) traversals.x = traversals.x.reverse();
+  if (vector.y ===  1) traversals.y = traversals.y.reverse();
+  
+  if(vector.x !== 0){
+    traversals.x.forEach(function (x) {
+      traversals.y.forEach(function (y) {
+        callback(x, y)
+      });
+    });
+  }
+  
+  else{
+    traversals.y.forEach(function (y) {
+      traversals.x.forEach(function (x) {
+        callback(x, y)
+      });
+    });
+  }
+  
+};
 
-  return traversals;
+GameManager.prototype.getFarthestPosition = function (vector, cell, ahead) {
+  
+  var farthest = {};
+  
+  if(vector.x == 0){
+    farthest.x = cell.x;
+  }
+  
+  else if(vector.x < 0){
+    farthest.x = ahead;
+  }
+  
+  else if(vector.x > 0){
+    farthest.x = this.size - ahead - 1;
+  }
+  
+  if(vector.y == 0){
+    farthest.y = cell.y;
+  }
+  
+  else if(vector.y < 0){
+    farthest.y = ahead;
+  }
+  
+  else if(vector.y > 0){
+    farthest.y = this.size - ahead - 1;
+  }
+  
+  return farthest;
 };
 
 GameManager.prototype.findFarthestPosition = function (cell, vector) {
