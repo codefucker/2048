@@ -228,7 +228,16 @@ hr {
 .tile, .tile .tile-inner {
   width: 82px;
   height: 82px;
-  line-height: 82px; }
+  line-height: 82px;
+  transition: .3s width, .3s height; }
+.tile.tile-merged-right {
+  margin-left: -19px; }
+  .tile.tile-merged-right, .tile.tile-merged-right .tile-inner {
+    width: 101px; }
+.tile.tile-merged-bottom {
+  margin-top: -19px; }
+  .tile.tile-merged-bottom, .tile.tile-merged-bottom .tile-inner {
+    height: 101px; }
 .tile.tile-position-1-1 {
   -webkit-transform: translate(0px, 0px);
   -moz-transform: translate(0px, 0px);
@@ -511,15 +520,6 @@ hr {
     -webkit-transform: scale(1);
     -moz-transform: scale(1);
     transform: scale(1); } }
-.tile-merged .tile-inner {
-  z-index: 20;
-  -webkit-animation: pop 200ms ease 100ms;
-  -moz-animation: pop 200ms ease 100ms;
-  animation: pop 200ms ease 100ms;
-  -webkit-animation-fill-mode: backwards;
-  -moz-animation-fill-mode: backwards;
-  animation-fill-mode: backwards; }
-
 @-webkit-keyframes drop {
   0% {
     opacity: 1;
@@ -725,7 +725,16 @@ hr {
   .tile, .tile .tile-inner {
     width: 44px;
     height: 44px;
-    line-height: 44px; }
+    line-height: 44px;
+    transition: .3s width, .3s height; }
+  .tile.tile-merged-right {
+    margin-left: -14px; }
+    .tile.tile-merged-right, .tile.tile-merged-right .tile-inner {
+      width: 58px; }
+  .tile.tile-merged-bottom {
+    margin-top: -14px; }
+    .tile.tile-merged-bottom, .tile.tile-merged-bottom .tile-inner {
+      height: 58px; }
   .tile.tile-position-1-1 {
     -webkit-transform: translate(0px, 0px);
     -moz-transform: translate(0px, 0px);

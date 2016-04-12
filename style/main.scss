@@ -302,6 +302,24 @@ hr {
       width: ceil($tile-size);
       height: ceil($tile-size);
       line-height: ceil($tile-size);
+      
+      transition: .3s width, .3s height;
+    }
+    
+    &.tile-merged-right{
+      margin-left: -1 * ceil($grid-spacing + 4);
+      
+      &, .tile-inner {
+        width: ceil($tile-size + $grid-spacing + 4);
+      }
+    }
+    
+    &.tile-merged-bottom{
+      margin-top: -1 * ceil($grid-spacing + 4);
+      
+      &, .tile-inner {
+        height: ceil($tile-size + $grid-spacing + 4);
+      }
     }
 
     // Build position classes
@@ -500,9 +518,9 @@ hr {
 }
 
 .tile-merged .tile-inner {
-  z-index: 20;
-  @include animation(pop 200ms ease $transition-speed);
-  @include animation-fill-mode(backwards);
+  // z-index: 20;
+  // @include animation(pop 200ms ease $transition-speed);
+  // @include animation-fill-mode(backwards);
 }
 
 @include keyframes(drop) {

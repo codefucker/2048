@@ -1,4 +1,7 @@
 {
 	"size": 5,
-	"colorsVariability": [0.5, 0.3, 0.18, 0.15, 0.1, 0.1]
+	"colorsVariability": [5, 3, 2, 1.5, 1, 1],
+	"styles": {
+		
+	}
 }

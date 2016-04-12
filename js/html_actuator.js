@@ -9,7 +9,7 @@ function HTMLActuator() {
 
 HTMLActuator.prototype.actuate = function (grid, metadata) {
   var self = this;
-
+  
   window.requestAnimationFrame(function () {
     self.clearContainer(self.tileContainer);
     
@@ -81,6 +81,11 @@ HTMLActuator.prototype.addTile = function (tile) {
   
   if (tile.dropOut) {
     classes.push("tile-drop");
+    this.applyClasses(wrapper, classes);
+  };
+  
+  if (tile.merged) {
+    classes.push("tile-merged-" + tile.merged);
     this.applyClasses(wrapper, classes);
   };
 

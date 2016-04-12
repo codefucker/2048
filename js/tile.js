@@ -1,8 +1,9 @@
-function Tile(position, color) {
+function Tile(position, color, merged) {
   this.x                = position.x;
   this.y                = position.y;
   // this.value            = value || 2;
-  this.color            = color || 1;
+  this.color            = color  || 1;
+  this.merged           = merged || null;
 
   this.previousPosition = null;
   this.ahead            = null;
@@ -29,6 +30,7 @@ Tile.prototype.serialize = function () {
       x: this.x,
       y: this.y
     },
+    merged: this.merged,
     color: this.color
   };
 };

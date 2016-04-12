@@ -38,7 +38,7 @@ GameManager.prototype.isGameTerminated = function () {
 // Set up the game
 GameManager.prototype.setup = function () {
   var previousState = this.storageManager.getGameState();
-
+  
   // Reload the game from a previous game if present
   if (previousState) {
     this.grid        = new Grid(previousState.grid.size,
@@ -57,7 +57,7 @@ GameManager.prototype.setup = function () {
     // Add the initial tiles
     this.addStartTiles();
   }
-
+  
   // Update the actuator
   this.actuate();
 };
@@ -144,7 +144,7 @@ GameManager.prototype.serialize = function () {
 GameManager.prototype.prepareTiles = function () {
   this.grid.eachCell(function (x, y, tile) {
     if (tile) {
-      // tile.mergedFrom = null;
+      tile.merged = null;
       tile.ahead = null;
       tile.savePosition();
     }
@@ -241,16 +241,17 @@ GameManager.prototype.move = function (direction) {
         var ahead = self.countTilesAhead(cell, vector);
         var tilesNear = self.findSimilarTilesNear(tile, asix);
         
+        // If have tiles near, calculate max ahead tiles
         if(tilesNear.length){
           var maxAhead = ahead;
 
           tilesNear.forEach(function(nearTile){
-            var ahead = self.countTilesAhead(nearTile, vector);
+            var ahead = self.countTilesAhead(nearTile.tile, vector);
             maxAhead = (maxAhead < ahead) ? ahead : maxAhead;
           });
           
           tilesNear.forEach(function(nearTile){
-            nearTile.ahead = maxAhead;
+            nearTile.tile.ahead = maxAhead;
           });
 
           tile.ahead = ahead = maxAhead;
@@ -270,27 +271,34 @@ GameManager.prototype.move = function (direction) {
     }
   });
 
-  var tiles  = self.grid.getTiles();
-  
-  tiles.forEach(function(tile){
-    var tilesNear = self.findSimilarTilesNear(tile);
-    
-    
-    if(tilesNear.length > 1){
-      
-      self.score += tilesNear.length + 1;
-      
-      tile.dropOut = true;
-      droped = true;
-      // self.grid.removeTile(tile);
-      
-      tilesNear.forEach(function(nearTile){
-        nearTile.dropOut = true;
-      });
-    };
-  });
-  
   if (moved) {
+    var tiles  = self.grid.getTiles();
+    
+    tiles.forEach(function(tile){
+      var tilesNear = self.findSimilarTilesNear(tile);
+      
+      if(tilesNear.length > 1){
+        
+        self.score += tilesNear.length + 1;
+        
+        tile.dropOut = true;
+        droped = true;
+        // self.grid.removeTile(tile);
+        
+        tilesNear.forEach(function(nearTile){
+          nearTile.tile.dropOut = true;
+        });
+      }
+      
+      if(tilesNear.length){
+        
+        tilesNear.forEach(function(nearTile){
+          nearTile.tile.merged = nearTile.side;
+        });
+        
+      }
+    });
+    
     this.addRandomTile();
     
     // Save state
@@ -440,15 +448,23 @@ GameManager.prototype.findSimilarTilesNear = function (tile, asix) {
   var self = this;
   var cells = this.grid.getCellsNear(tile, asix);
   
-  cells.forEach(function (cell) {
+  cells.forEach(function (cell, i) {
     var nearTile = self.grid.cellContent(cell);
   
     if(nearTile && nearTile.color === tile.color){
-      nearTiles.push(nearTile);
+      
+      var side = self.getSide(i);
+      
+      nearTiles.push({tile: nearTile, side: side});
     };
   });
   
   return nearTiles;
+};
+
+GameManager.prototype.getSide = function (i) {
+  var sides = ['right', 'left', 'bottom', 'top'];
+  return sides[i];
 };
 
 GameManager.prototype.movesAvailable = function () {
