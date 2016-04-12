@@ -46,7 +46,8 @@ KeyboardInputManager.prototype.listen = function () {
     87: 0, // W
     68: 1, // D
     83: 2, // S
-    65: 3  // A
+    65: 3, // A
+    90:-1, // Z (undo)
   };
 
   // Respond to direction keys
@@ -72,6 +73,7 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
+  this.bindButtonPress(".back-button", this.goBack);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -135,6 +137,11 @@ KeyboardInputManager.prototype.restart = function (event) {
 KeyboardInputManager.prototype.keepPlaying = function (event) {
   event.preventDefault();
   this.emit("keepPlaying");
+};
+
+KeyboardInputManager.prototype.goBack = function (event) {
+  event.preventDefault();
+  this.emit("goBack");
 };
 
 KeyboardInputManager.prototype.bindButtonPress = function (selector, fn) {
